@@ -258,7 +258,7 @@
 				</br>
                     <div class="col-sm-4">
 						<div class="form-group">
-							{!! Form::label('upload_document', __('sale.bill_of_loading') . ':') !!}
+							{!! Form::label('upload_document', __('sale.bill_of_lading') . ':') !!}
 							{!! Form::file('sell_document', ['id' => 'upload_document1', 'accept' => implode(',', array_keys(config('constants.document_upload_mimes_types')))]); !!}
 							<p class="help-block">
 								@lang('purchase.max_file_size', ['size' => (config('constants.document_size_limit') / 1000000)])
@@ -437,10 +437,10 @@
 						<thead>
 							<tr>
 								<th class="text-center">	
-									@lang('sale.product')
+									@lang('sale.item')
 								</th>
 								<th class="text-center">
-									@lang('sale.qty')
+									@lang('sale.rent_days')
 								</th>
 								@if(!empty($pos_settings['inline_service_staff']))
 									<th class="text-center">
@@ -448,20 +448,23 @@
 									</th>
 								@endif
 								<th class="@if(!auth()->user()->can('edit_product_price_from_sale_screen')) hide @endif">
-									@lang('sale.unit_price')
+									@lang('sale.rate_vat')
 								</th>
-								<th class="@if(!auth()->user()->can('edit_product_discount_from_sale_screen')) hide @endif">
+								{{-- <th class="@if(!auth()->user()->can('edit_product_discount_from_sale_screen')) hide @endif">
 									@lang('receipt.discount')
-								</th>
+								</th> --}}
 								<th class="text-center {{$hide_tax}}">
 									@lang('sale.tax')
 								</th>
 								<th class="text-center {{$hide_tax}}">
 									@lang('sale.price_inc_tax')
 								</th>
-								<th class="text-center th_vessel_charges" style="display:none">
-									Vessel Arrival Charges
+								<th class="text-center th_weight">
+									@lang('lang_v1.weight')
 								</th>
+								{{-- <th class="text-center th_vessel_charges" style="display:none">
+									Vessel Arrival Charges
+								</th> --}}
 								@if(!empty($common_settings['enable_product_warranty']))
 									<th>@lang('lang_v1.warranty')</th>
 								@endif
@@ -1053,10 +1056,9 @@
 				console.log(data);
 				var rentDayQty = data.rentDays - 7;
 				if(data.rentDays > 7){
-					var vesselHtml = '<lable>Vessel:</lable>' +data.name+ ', Arrival Date:' +data.arrivalDate+ ' ('+data.rentDays+' days ago)';
+					var vesselHtml = '<label>Vessel Arrival Date</label>: ' +data.arrivalDate+ '     <label>Rent days</label>('+data.rentDays+' days ago)';
 					$('.vessel_rent').show();
 					$('.vessel_rent').html(vesselHtml);
-					alert(rentDayQty);
 					$('#rent_days_value').val(rentDayQty);
 					$('.th_vessel_charges').show();
 				}else{

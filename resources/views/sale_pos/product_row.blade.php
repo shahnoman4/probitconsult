@@ -342,7 +342,7 @@
 				<small class="text-muted">@lang('lang_v1.prev_unit_price'): @format_currency($last_sell_line->unit_price_before_discount)</small>
 			@endif
 		</td>
-		<td @if(!$edit_discount) class="hide" @endif>
+		{{-- <td @if(!$edit_discount) class="hide" @endif>
 			{!! Form::text("products[$row_count][line_discount_amount]", @num_format($discount_amount), ['class' => 'form-control input_number row_discount_amount']); !!}<br>
 			{!! Form::select("products[$row_count][line_discount_type]", ['fixed' => __('lang_v1.fixed'), 'percentage' => __('lang_v1.percentage')], $discount_type , ['class' => 'form-control row_discount_type']); !!}
 			@if(!empty($discount))
@@ -360,7 +360,7 @@
 					@endif
 				</small>
 			@endif
-		</td>
+		</td> --}}
 		<td class="text-center {{$hide_tax}}">
 			{!! Form::hidden("products[$row_count][item_tax]", @num_format($item_tax), ['class' => 'item_tax']); !!}
 		
@@ -379,8 +379,11 @@
 		@endif
 	@endif
 	<td>
-		<input type="number" name="products[{{$row_count}}][vessel_arrival_charges]" class="form-control pos_vessel_arrival_charges input_number" value="0" >
+		<input type="number" name="products[{{$row_count}}][total_weight]" class="form-control pos_total_weight input_number" value="0" >
 	</td>
+	{{-- <td>
+		<input type="number" name="products[{{$row_count}}][vessel_arrival_charges]" class="form-control pos_vessel_arrival_charges input_number" value="0" >
+	</td> --}}
 	<td class="{{$hide_tax}}">
 		<input type="text" name="products[{{$row_count}}][unit_price_inc_tax]" class="form-control pos_unit_price_inc_tax input_number" value="{{@num_format($unit_price_inc_tax)}}" @if(!$edit_price) readonly @endif @if(!empty($pos_settings['enable_msp'])) data-rule-min-value="{{$unit_price_inc_tax}}" data-msg-min-value="{{__('lang_v1.minimum_selling_price_error_msg', ['price' => @num_format($unit_price_inc_tax)])}}" @endif>
 	</td>

@@ -241,7 +241,7 @@ class AdminSidebarMenu
             //Sell dropdown
             if ($is_admin || auth()->user()->hasAnyPermission(['sell.view', 'sell.create', 'direct_sell.access', 'view_own_sell_only', 'view_commission_agent_sell', 'access_shipping', 'access_own_shipping', 'access_commission_agent_shipping', 'access_sell_return', 'direct_sell.view', 'direct_sell.update', 'access_own_sell_return'])) {
                 $menu->dropdown(
-                    __('sale.sale'),
+                    __('sale.revenue_invoice'),
                     function ($sub) use ($enabled_modules, $is_admin, $pos_settings) {
                         if (! empty($pos_settings['enable_sales_order']) && ($is_admin || auth()->user()->hasAnyPermission(['so.view_own', 'so.view_all', 'so.create']))) {
                             $sub->url(
@@ -265,6 +265,36 @@ class AdminSidebarMenu
                                 ['icon' => 'fa fas fa-plus-circle', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == 'create' && empty(request()->get('status'))]
                             );
                         }
+
+                        // if (in_array('add_sale', $enabled_modules) && auth()->user()->can('direct_sell.access')) {
+                        //     $sub->url(
+                        //         action([\App\Http\Controllers\SellController::class, 'create'], ['status' => 'draft']),
+                        //         __('lang_v1.add_draft'),
+                        //         ['icon' => 'fa fas fa-plus-circle', 'active' => request()->get('status') == 'draft']
+                        //     );
+                        // }
+                        if (in_array('add_sale', $enabled_modules) && ($is_admin || auth()->user()->hasAnyPermission(['draft.view_all', 'draft.view_own']))) {
+                            $sub->url(
+                                action([\App\Http\Controllers\SellController::class, 'getDrafts']),
+                                __('lang_v1.list_drafts'),
+                                ['icon' => 'fa fas fa-pen-square', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == 'drafts']
+                            );
+                        }
+                        // if (in_array('add_sale', $enabled_modules) && auth()->user()->can('direct_sell.access')) {
+                        //     $sub->url(
+                        //         action([\App\Http\Controllers\SellController::class, 'create'], ['status' => 'quotation']),
+                        //         __('lang_v1.add_quotation'),
+                        //         ['icon' => 'fa fas fa-plus-circle', 'active' => request()->get('status') == 'quotation']
+                        //     );
+                        // }
+                        if (in_array('add_sale', $enabled_modules) && ($is_admin || auth()->user()->hasAnyPermission(['quotation.view_all', 'quotation.view_own']))) {
+                            $sub->url(
+                                action([\App\Http\Controllers\SellController::class, 'getQuotations']),
+                                __('lang_v1.list_quotations'),
+                                ['icon' => 'fa fas fa-pen-square', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == 'quotations']
+                            );
+                        }
+
                         if (auth()->user()->can('sell.create')) {
                             if (in_array('pos_sale', $enabled_modules)) {
                                 if (auth()->user()->can('sell.view')) {
@@ -281,35 +311,6 @@ class AdminSidebarMenu
                                     ['icon' => 'fa fas fa-plus-circle', 'active' => request()->segment(1) == 'pos' && request()->segment(2) == 'create']
                                 );
                             }
-                        }
-
-                        if (in_array('add_sale', $enabled_modules) && auth()->user()->can('direct_sell.access')) {
-                            $sub->url(
-                                action([\App\Http\Controllers\SellController::class, 'create'], ['status' => 'draft']),
-                                __('lang_v1.add_draft'),
-                                ['icon' => 'fa fas fa-plus-circle', 'active' => request()->get('status') == 'draft']
-                            );
-                        }
-                        if (in_array('add_sale', $enabled_modules) && ($is_admin || auth()->user()->hasAnyPermission(['draft.view_all', 'draft.view_own']))) {
-                            $sub->url(
-                                action([\App\Http\Controllers\SellController::class, 'getDrafts']),
-                                __('lang_v1.list_drafts'),
-                                ['icon' => 'fa fas fa-pen-square', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == 'drafts']
-                            );
-                        }
-                        if (in_array('add_sale', $enabled_modules) && auth()->user()->can('direct_sell.access')) {
-                            $sub->url(
-                                action([\App\Http\Controllers\SellController::class, 'create'], ['status' => 'quotation']),
-                                __('lang_v1.add_quotation'),
-                                ['icon' => 'fa fas fa-plus-circle', 'active' => request()->get('status') == 'quotation']
-                            );
-                        }
-                        if (in_array('add_sale', $enabled_modules) && ($is_admin || auth()->user()->hasAnyPermission(['quotation.view_all', 'quotation.view_own']))) {
-                            $sub->url(
-                                action([\App\Http\Controllers\SellController::class, 'getQuotations']),
-                                __('lang_v1.list_quotations'),
-                                ['icon' => 'fa fas fa-pen-square', 'active' => request()->segment(1) == 'sells' && request()->segment(2) == 'quotations']
-                            );
                         }
 
                         if (auth()->user()->can('access_sell_return') || auth()->user()->can('access_own_sell_return')) {
