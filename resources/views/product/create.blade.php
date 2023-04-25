@@ -308,35 +308,26 @@
 
     @component('components.widget', ['class' => 'box-primary'])
         <div class="row">
-
-        <div class="col-sm-4 @if(!session('business.enable_price_tax')) hide @endif">
-          <div class="form-group">
-            {!! Form::label('tax', __('product.applicable_tax') . ':') !!}
-              {!! Form::select('tax', $taxes, !empty($duplicate_product->tax) ? $duplicate_product->tax : null, ['placeholder' => __('messages.please_select'), 'class' => 'form-control select2'], $tax_attributes); !!}
+          <div class="col-sm-4">
+            <div class="form-group">
+              {!! Form::label('product_rate_1',  __('product.rates') . ' Tier 1:') !!}
+              {!! Form::number('product_rate_1', !empty($duplicate_product->product_rate_1) ? $duplicate_product->product_rate_1 : null, ['class' => 'form-control', 'placeholder' => __('product.rates')]); !!}
+            </div>
           </div>
-        </div>
-
-        <div class="col-sm-4 @if(!session('business.enable_price_tax')) hide @endif">
-          <div class="form-group">
-            {!! Form::label('tax_type', __('product.selling_price_tax_type') . ':*') !!}
-              {!! Form::select('tax_type', ['inclusive' => __('product.inclusive'), 'exclusive' => __('product.exclusive')], !empty($duplicate_product->tax_type) ? $duplicate_product->tax_type : 'exclusive',
-              ['class' => 'form-control select2', 'required']); !!}
+          <div class="col-sm-4">
+            <div class="form-group">
+              {!! Form::label('product_rate_2',  __('product.rates') . ' Tier 2:') !!}
+              {!! Form::number('product_rate_2', !empty($duplicate_product->product_rate_2) ? $duplicate_product->product_rate_2 : null, ['class' => 'form-control', 'placeholder' => __('product.rates')]); !!}
+            </div>
           </div>
-        </div>
-
+          <div class="col-sm-4">
+            <div class="form-group">
+              {!! Form::label('product_rate_3',  __('product.rates') . ' Tier 3:') !!}
+              {!! Form::number('product_rate_3', !empty($duplicate_product->product_rate_3) ? $duplicate_product->product_rate_3 : null, ['class' => 'form-control', 'placeholder' => __('product.rates')]); !!}
+            </div>
+          </div>
+        
         <div class="clearfix"></div>
-
-        <div class="col-sm-4">
-          <div class="form-group">
-            {!! Form::label('type', __('product.product_type') . ':*') !!} @show_tooltip(__('tooltip.product_type'))
-            {!! Form::select('type', $product_types, !empty($duplicate_product->type) ? $duplicate_product->type : null, ['class' => 'form-control select2',
-            'required', 'data-action' => !empty($duplicate_product) ? 'duplicate' : 'add', 'data-product_id' => !empty($duplicate_product) ? $duplicate_product->id : '0']); !!}
-          </div>
-        </div>
-
-        <div class="form-group col-sm-12" id="product_form_part">
-          @include('product.partials.single_product_form_part', ['profit_percent' => $default_profit_percent])
-        </div>
 
         <input type="hidden" id="variation_counter" value="1">
         <input type="hidden" id="default_profit_percent" 

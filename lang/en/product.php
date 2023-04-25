@@ -58,4 +58,5 @@ return [
     'import_products' => 'Import Products',
     'file_to_import' => 'File To Import',
     'file_imported_successfully' => 'File imported successfully',
+    'rates' => 'Rate(s)',
 ];

@@ -27,6 +27,9 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->integer('sub_category_id')->unsigned()->nullable();
             $table->foreign('sub_category_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->string('product_rate_1')->nullable();
+            $table->string('product_rate_2')->nullable();
+            $table->string('product_rate_3')->nullable();
             $table->integer('tax')->unsigned()->nullable();
             $table->foreign('tax')->references('id')->on('tax_rates');
             $table->enum('tax_type', ['inclusive', 'exclusive']);

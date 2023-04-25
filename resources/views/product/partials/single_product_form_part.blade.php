@@ -13,7 +13,7 @@
 <div class="table-responsive">
     <table class="table table-bordered add-product-price-table table-condensed {{$class}}">
         <tr>
-          <th>@lang('product.default_purchase_price')</th>
+          <th>@lang('product.default_purchase_price') Tier 1</th>
           <th>@lang('product.profit_percent') @show_tooltip(__('tooltip.profit_percent'))</th>
           <th>@lang('product.default_selling_price')</th>
           @if(empty($quick_add))

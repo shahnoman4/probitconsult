@@ -78,14 +78,14 @@ class ProductController extends Controller
                 ->leftJoin('categories as c1', 'products.category_id', '=', 'c1.id')
                 ->leftJoin('categories as c2', 'products.sub_category_id', '=', 'c2.id')
                 ->leftJoin('tax_rates', 'products.tax', '=', 'tax_rates.id')
-                ->join('variations as v', 'v.product_id', '=', 'products.id')
-                ->leftJoin('variation_location_details as vld', function ($join) use ($permitted_locations) {
-                    $join->on('vld.variation_id', '=', 'v.id');
-                    if ($permitted_locations != 'all') {
-                        $join->whereIn('vld.location_id', $permitted_locations);
-                    }
-                })
-                ->whereNull('v.deleted_at')
+                //->join('variations as v', 'v.product_id', '=', 'products.id')
+                // ->leftJoin('variation_location_details as vld', function ($join) use ($permitted_locations) {
+                //     $join->on('vld.variation_id', '=', 'v.id');
+                //     if ($permitted_locations != 'all') {
+                //         $join->whereIn('vld.location_id', $permitted_locations);
+                //     }
+                // })
+                //->whereNull('v.deleted_at')
                 ->where('products.business_id', $business_id)
                 ->where('products.type', '!=', 'modifier');
 
@@ -126,11 +126,15 @@ class ProductController extends Controller
                 'products.product_custom_field3',
                 'products.product_custom_field4',
                 'products.alert_quantity',
-                DB::raw('SUM(vld.qty_available) as current_stock'),
-                DB::raw('MAX(v.sell_price_inc_tax) as max_price'),
-                DB::raw('MIN(v.sell_price_inc_tax) as min_price'),
-                DB::raw('MAX(v.dpp_inc_tax) as max_purchase_price'),
-                DB::raw('MIN(v.dpp_inc_tax) as min_purchase_price')
+                'products.product_rate_1 as max_price',
+                'products.product_rate_1 as max_purchase_price',
+                'products.product_rate_1 as min_price',
+                'products.product_rate_1 as min_purchase_price',
+                //DB::raw('SUM(vld.qty_available) as current_stock'),
+                // DB::raw('MAX(v.sell_price_inc_tax) as max_price'),
+                // DB::raw('MIN(v.sell_price_inc_tax) as min_price'),
+                // DB::raw('MAX(v.dpp_inc_tax) as max_purchase_price'),
+                // DB::raw('MIN(v.dpp_inc_tax) as min_purchase_price')
                 );
 
             //if woocomerce enabled add field to query
@@ -442,7 +446,7 @@ class ProductController extends Controller
         }
         try {
             $business_id = $request->session()->get('user.business_id');
-            $form_fields = ['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'type', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids', 'preparation_time_in_minutes'];
+            $form_fields = ['name', 'brand_id', 'unit_id', 'category_id','product_rate_1','product_rate_2','product_rate_3', 'tax','barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids', 'preparation_time_in_minutes'];
 
             $module_form_fields = $this->moduleUtil->getModuleFormField('product_form_fields');
             if (! empty($module_form_fields)) {
@@ -451,6 +455,7 @@ class ProductController extends Controller
 
             $product_details = $request->only($form_fields);
             $product_details['business_id'] = $business_id;
+            $product_details['type'] = 'single';
             $product_details['created_by'] = $request->session()->get('user.id');
 
             $product_details['enable_stock'] = (! empty($request->input('enable_stock')) && $request->input('enable_stock') == 1) ? 1 : 0;
@@ -504,33 +509,33 @@ class ProductController extends Controller
                 $product->product_locations()->sync($product_locations);
             }
 
-            if ($product->type == 'single') {
-                $this->productUtil->createSingleProductVariation($product->id, $product->sku, $request->input('single_dpp'), $request->input('single_dpp_inc_tax'), $request->input('profit_percent'), $request->input('single_dsp'), $request->input('single_dsp_inc_tax'));
-            } elseif ($product->type == 'variable') {
-                if (! empty($request->input('product_variation'))) {
-                    $input_variations = $request->input('product_variation');
-                    $this->productUtil->createVariableProductVariations($product->id, $input_variations);
-                }
-            } elseif ($product->type == 'combo') {
+            // if ($product->type == 'single') {
+            //     $this->productUtil->createSingleProductVariation($product->id, $product->sku, $request->input('single_dpp'), $request->input('single_dpp_inc_tax'), $request->input('profit_percent'), $request->input('single_dsp'), $request->input('single_dsp_inc_tax'));
+            // } elseif ($product->type == 'variable') {
+            //     if (! empty($request->input('product_variation'))) {
+            //         $input_variations = $request->input('product_variation');
+            //         $this->productUtil->createVariableProductVariations($product->id, $input_variations);
+            //     }
+            // } elseif ($product->type == 'combo') {
 
-                //Create combo_variations array by combining variation_id and quantity.
-                $combo_variations = [];
-                if (! empty($request->input('composition_variation_id'))) {
-                    $composition_variation_id = $request->input('composition_variation_id');
-                    $quantity = $request->input('quantity');
-                    $unit = $request->input('unit');
+            //     //Create combo_variations array by combining variation_id and quantity.
+            //     $combo_variations = [];
+            //     if (! empty($request->input('composition_variation_id'))) {
+            //         $composition_variation_id = $request->input('composition_variation_id');
+            //         $quantity = $request->input('quantity');
+            //         $unit = $request->input('unit');
 
-                    foreach ($composition_variation_id as $key => $value) {
-                        $combo_variations[] = [
-                            'variation_id' => $value,
-                            'quantity' => $this->productUtil->num_uf($quantity[$key]),
-                            'unit_id' => $unit[$key],
-                        ];
-                    }
-                }
+            //         foreach ($composition_variation_id as $key => $value) {
+            //             $combo_variations[] = [
+            //                 'variation_id' => $value,
+            //                 'quantity' => $this->productUtil->num_uf($quantity[$key]),
+            //                 'unit_id' => $unit[$key],
+            //             ];
+            //         }
+            //     }
 
-                $this->productUtil->createSingleProductVariation($product->id, $product->sku, $request->input('item_level_purchase_price_total'), $request->input('purchase_price_inc_tax'), $request->input('profit_percent'), $request->input('selling_price'), $request->input('selling_price_inc_tax'), $combo_variations);
-            }
+            //     $this->productUtil->createSingleProductVariation($product->id, $product->sku, $request->input('item_level_purchase_price_total'), $request->input('purchase_price_inc_tax'), $request->input('profit_percent'), $request->input('selling_price'), $request->input('selling_price_inc_tax'), $combo_variations);
+            // }
 
             //Add product racks details.
             $product_racks = $request->get('product_racks', null);
